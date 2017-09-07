@@ -9,7 +9,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
   </head>
   <body>
-    <iframe src='https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI&font=Default&lang=en&initial_zoom=2&height=600' width='600' height='600' frameborder='0'></iframe>
+  <script language="javascript">
+  function reSize(){
+  　　parent.document.all.timeline.height=document.body.scrollHeight; 
+  } 
+  window.onload=reSize;
+  </script>
+    <iframe src='https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI&font=Default&lang=en&initial_zoom=2&height=600' width='600' height='600' frameborder='0' id='timeline'></iframe>
                                     
   </body>
 </html>
