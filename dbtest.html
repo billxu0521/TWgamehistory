@@ -29,6 +29,7 @@
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
     <script>
     //處理下拉選單
+    /*
     var sql_dabase = "https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/";
     $.getJSON(sql_dabase + "values?alt=json-in-script&callback=?", function(json){  
       var $cSel = $('select[name="query_list"]');
@@ -50,10 +51,10 @@
         //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
         html += no + name_jp + name_ch + "<br/>";
       }
-    });
+    });*/
 
     //測試讀取資料庫
-    function load_data(){
+    function sheet_load_data(){
       $.getJSON("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?", function(json){  
       var e = json.feed.entry,
       l = e.length,
@@ -98,20 +99,117 @@
       $("#test").html(html);
     });}
 
+    //查詢式
+    function sql_query(sheetID,gid,sql = null){
+      var sheetID = sheetID; // 試算表代號
+      var gid = gid; // 工作表代號
+      var sql = sql; // SQL 語法
+      var callback = "callback"; // 回呼函數名稱
+      //送出查詢
+      if(sql == null){
+        $.getScript("https://spreadsheets.google.com/tq?tqx=responseHandler:" + callback + "&key=" + sheetID + "&gid=" + gid);
+      }else{
+        $.getScript("https://spreadsheets.google.com/tq?tqx=responseHandler:" + callback + "&tq=" + sql + "&key=" + sheetID + "&gid=" + gid);
+      }
+      return callback;
+    }
+
+    //
+    function list_load_data(){
+      var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
+      gid = "2128108946", // 工作表代號
+      sql = "SELECT+B+%2C+C"; // SQL 語法
+      
+      var res = sql_query (sheetID,gid,sql);
+
+      window[res] = function(json) {
+        var $cSel = $('select[name="query_list"]');
+        var rowArray = json.table.rows,
+        
+        rowLength = rowArray.length,
+        html = "",
+        i, j, name_jp, name_jp;
+        console.log(rowArray);
+        for (i = 0; i < rowLength; i++) {
+          dataGroup = rowArray[i].c;
+          dataLength = dataGroup.length;
+          for (j = 0; j < dataLength; j++) {
+            if (!dataGroup[j]) {
+              continue;
+            }
+            
+          //html += (dataGroup[j].f || dataGroup[j].v || "") + " ";
+          
+          }
+          name_jp = dataGroup[0].v;
+          name_ch = dataGroup[1].v;
+          $cSel.append($("<option></option>")
+               .attr("value",name_jp)
+               .text(name_ch)); 
+          //html += "<br/>";
+        }
+        $("#test").html(html);
+      }
+    }
+    //測試
+    function food_query(){
+      var $cSel = $('select[name="query_list"]');
+      var select_option_val = $cSel.val();
+      
+      var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
+      gid = "677707019", // 工作表代號
+      sql = "SELECT B,D WHERE E = '" + select_option_val + "'"; // SQL 語法
+      var url_sql = encodeURI(sql);
+
+      var res = sql_query (sheetID,gid,url_sql);
+      console.log(sql);
+      console.log(url_sql);
+      window[res] = function(json) {
+        var rowArray = json.table.rows,
+        rowLength = rowArray.length,
+        html = "",
+        i, j, name_jp, name_jp, spell;
+        console.log(rowArray);
+        for (i = 0; i < rowLength; i++) {
+          dataGroup = rowArray[i].c;
+          dataLength = dataGroup.length;
+          for (j = 0; j < dataLength; j++) {
+            if (!dataGroup[j]) {
+              continue;
+            }
+          }
+          name_jp = dataGroup[0].v;
+          spell = dataGroup[1].v;
+          
+          html += "食譜名稱:" + name_jp + ",效果:" + spell +  "<br/>";
+          //html += "<br/>";
+        }
+        $("#test").html(html);
+      }
+    }
+
+    //網頁開始執行
+    $(function ()  {
+      console.log('start');
+      list_load_data();
+    });
+
+
 
     </script>
 
 
   </head>
   <body>
-  
+  <div>
+  <a>薩爾達食譜快速檢索器 0.1版</a>
+  </div>
   <select name="query_list" class="opts">2
-  <option selected value="default">請選擇</option>
+  <option selected value="default">請選擇食材</option>
   </select>
   <div></div>
-  <button onclick="query_data()">查詢中文名稱</button>
+  <button onclick="food_query()">查詢相關料理</button>
 
-    <!--iframe src='https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI&font=Default&lang=en&initial_zoom=2' frameborder='0' id='timeline'></iframe-->
                                     
   </body>
 </html>
