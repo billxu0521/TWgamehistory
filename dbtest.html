@@ -9,9 +9,6 @@
 
     <!-- 2 -->
     <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
-
-    <div id='timeline-embed' style="width: 100%; height: 600px"></div>
-
     <!-- 3 -->
     <script type="text/javascript">
     // The TL.Timeline constructor takes at least two arguments:
@@ -26,38 +23,93 @@
     </script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react-dom.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
     <script language="javascript">
-  function reSize(){
-    parent.document.all.timeline.height=document.body.scrollHeight; 
-    parent.document.all.timeline.width=document.body.scrollWidth; 
+    </script> 
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
+    <script>
+    //處理下拉選單
+    var sql_dabase = "https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/";
+    $.getJSON(sql_dabase + "values?alt=json-in-script&callback=?", function(json){  
+      var $cSel = $('select[name="query_list"]');
+      var e = json.feed.entry,
+      l = e.length,
+      html = "",
+      entry, i, no, name_jp, name_ch;
+      //console.log(l);
+      for (i = 0; i < l; i++) {
+        entry = e[i];
+        //console.log(entry.gsx$namejp.$t);
 
-  } 
-  //window.onload=reSize;
-  </script>
-  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
-  <script>
-  $.getJSON("https://spreadsheets.google.com/feeds/list/18sp-S2iOQ9uRiuLprZZUDf9emipGesZ81Gfy5LPIR6c/1/public/values?alt=json-in-script&callback=?&sq=serial>W00010 and sex=%E5%A5%B3%E7%94%9F", function(json){
-    var e = json.feed.entry,
-    l = e.length,
-    html = "",
-    entry, i, authority, serial, name, sex, register;
-    for (i = 0; i < l; i++) {
-      entry = e[i];
-      authority = entry.gsx$authority.$t;
-      serial = entry.gsx$serial.$t;
-      name = entry.gsx$name.$t;
-      sex = entry.gsx$sex.$t;
-      register = entry.gsx$register.$t;
-      html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
-    }
-    $("#test").html(html);
-  });
-  </script>
+        no = entry.gsx$no.$t;
+        name_jp = entry.gsx$namejp.$t;
+        name_ch = entry.gsx$namech.$t;
+        $cSel.append($("<option></option>")
+               .attr("value",name_jp)
+               .text(name_jp)); 
+        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
+        html += no + name_jp + name_ch + "<br/>";
+      }
+    });
+
+    //測試讀取資料庫
+    function load_data(){
+      $.getJSON("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?", function(json){  
+      var e = json.feed.entry,
+      l = e.length,
+      html = "",
+      entry, i, no, name_jp, name_ch;
+      console.log(l);
+      for (i = 0; i < l; i++) {
+        entry = e[i];
+        //console.log(entry.gsx$namejp.$t);
+
+        no = entry.gsx$no.$t;
+        name_jp = entry.gsx$namejp.$t;
+        name_ch = entry.gsx$namech.$t;
+        
+        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
+        html += no + name_jp + name_ch + "<br/>";
+      }
+      $("#test").html(html);
+    });}
+
+    //查詢
+    function query_data(){
+      var $cSel = $('select[name="query_list"]');
+      var select_option_val = $cSel.val();
+      if(select_option_val == 'default') return;
+      $.getJSON("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?&sq=namejp="+select_option_val, function(json){  
+      console.log("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?&sq=namejp="+select_option_val);
+      var e = json.feed.entry,
+      l = e.length,
+      html = "",
+      entry, i, no, name_jp, name_ch , image , test;
+      for (i = 0; i < l; i++) {
+        entry = e[i];
+        console.log(entry);
+        no = entry.gsx$no.$t;
+        name_jp = entry.gsx$namejp.$t;
+        name_ch = entry.gsx$namech.$t;
+        image = entry.gsx$image.$t;
+        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
+        html += no + name_ch + "圖片:" + "<img src='" + image + "'></img>" + "<br/>";
+      }
+      $("#test").html(html);
+    });}
+
+
+    </script>
 
 
   </head>
   <body>
+  
+  <select name="query_list" class="opts">2
+  <option selected value="default">請選擇</option>
+  </select>
+  <div></div>
+  <button onclick="query_data()">查詢中文名稱</button>
 
     <!--iframe src='https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI&font=Default&lang=en&initial_zoom=2' frameborder='0' id='timeline'></iframe-->
                                     
