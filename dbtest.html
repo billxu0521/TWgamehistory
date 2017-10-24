@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Game TimeLine Project</title>
+
+    <!-- 1 -->
+    <link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+
+    <!-- 2 -->
+    <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+
+    <div id='timeline-embed' style="width: 100%; height: 600px"></div>
+
+    <!-- 3 -->
+    <script type="text/javascript">
+    // The TL.Timeline constructor takes at least two arguments:
+    // the id of the Timeline container (no '#'), and
+    // the URL to your JSON data file or Google spreadsheet.
+    // the id must refer to an element "above" this code,
+    // and the element must have CSS styling to give it width and height
+    // optionally, a third argument with configuration options can be passed.
+    // See below for more about options.
+    //timeline = new TL.Timeline('timeline-embed',
+    //'https://docs.google.com/spreadsheets/d/1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI/edit?usp=sharing');
+    </script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react-dom.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
+    <script language="javascript">
+  function reSize(){
+    parent.document.all.timeline.height=document.body.scrollHeight; 
+    parent.document.all.timeline.width=document.body.scrollWidth; 
+
+  } 
+  window.onload=reSize;
+  </script>
+  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
+  <script>
+  $.getJSON("https://spreadsheets.google.com/feeds/list/18sp-S2iOQ9uRiuLprZZUDf9emipGesZ81Gfy5LPIR6c/1/public/values?alt=json-in-script&callback=?", function(json){
+    var e = json.feed.entry,
+    l = e.length,
+    html = "",
+    entry, i, authority, serial, name, sex, register;
+    for (i = 0; i < l; i++) {
+      entry = e[i];
+      authority = entry.gsx$authority.$t;
+      serial = entry.gsx$serial.$t;
+      name = entry.gsx$name.$t;
+      sex = entry.gsx$sex.$t;
+      register = entry.gsx$register.$t;
+      html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
+    }
+    $("#test").html(html);
+  });
+  </script>
+
+
+  </head>
+  <body>
+
+    <!--iframe src='https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1pk8puMz7pQpUsWDgbBuAeF6PsnXZ4r2Px6Qe9na-mPI&font=Default&lang=en&initial_zoom=2' frameborder='0' id='timeline'></iframe-->
+                                    
+  </body>
+</html>
