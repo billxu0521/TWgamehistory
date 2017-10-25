@@ -14,76 +14,7 @@
     </script> 
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
     <script>
-    //處理下拉選單
-    /*
-    var sql_dabase = "https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/";
-    $.getJSON(sql_dabase + "values?alt=json-in-script&callback=?", function(json){  
-      var $cSel = $('select[name="query_list"]');
-      var e = json.feed.entry,
-      l = e.length,
-      html = "",
-      entry, i, no, name_jp, name_ch;
-      //console.log(l);
-      for (i = 0; i < l; i++) {
-        entry = e[i];
-        //console.log(entry.gsx$namejp.$t);
-
-        no = entry.gsx$no.$t;
-        name_jp = entry.gsx$namejp.$t;
-        name_ch = entry.gsx$namech.$t;
-        $cSel.append($("<option></option>")
-               .attr("value",name_jp)
-               .text(name_jp)); 
-        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
-        html += no + name_jp + name_ch + "<br/>";
-      }
-    });*/
-
-    //測試讀取資料庫
-    function sheet_load_data(){
-      $.getJSON("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?", function(json){  
-      var e = json.feed.entry,
-      l = e.length,
-      html = "",
-      entry, i, no, name_jp, name_ch;
-      console.log(l);
-      for (i = 0; i < l; i++) {
-        entry = e[i];
-        //console.log(entry.gsx$namejp.$t);
-
-        no = entry.gsx$no.$t;
-        name_jp = entry.gsx$namejp.$t;
-        name_ch = entry.gsx$namech.$t;
-        
-        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
-        html += no + name_jp + name_ch + "<br/>";
-      }
-      $("#test").html(html);
-    });}
-
-    //查詢
-    function query_data(){
-      var $cSel = $('select[name="query_list"]');
-      var select_option_val = $cSel.val();
-      if(select_option_val == 'default') return;
-      $.getJSON("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?&sq=namejp="+select_option_val, function(json){  
-      console.log("https://spreadsheets.google.com/feeds/list/1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0/1/public/values?alt=json-in-script&callback=?&sq=namejp="+select_option_val);
-      var e = json.feed.entry,
-      l = e.length,
-      html = "",
-      entry, i, no, name_jp, name_ch , image , test;
-      for (i = 0; i < l; i++) {
-        entry = e[i];
-        console.log(entry);
-        no = entry.gsx$no.$t;
-        name_jp = entry.gsx$namejp.$t;
-        name_ch = entry.gsx$namech.$t;
-        image = entry.gsx$image.$t;
-        //html += authority + " " + serial + " " + name + " " + sex + " " + register + "<br/>";
-        html += no + name_ch + "圖片:" + "<img src='" + image + "'></img>" + "<br/>";
-      }
-      $("#test").html(html);
-    });}
+   
 
     //查詢公用函式
     function sql_query(sheetID,gid,sql = null){
@@ -101,7 +32,7 @@
       return callback;
     }
 
-    //
+    //讀取食材列表
     function list_load_data(){
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "2128108946", // 工作表代號
@@ -123,22 +54,17 @@
           for (j = 0; j < dataLength; j++) {
             if (!dataGroup[j]) {
               continue;
-            }
-            
-          //html += (dataGroup[j].f || dataGroup[j].v || "") + " ";
-          
+            }          
           }
           name_jp = dataGroup[0].v;
           name_ch = dataGroup[1].v;
           $cSel.append($("<option></option>")
                .attr("value",name_jp)
                .text(name_ch)); 
-          //html += "<br/>";
         }
-        $("#test").html(html);
       }
     }
-    //測試
+    //查詢食譜
     function food_query(){
       var $cSel = $('select[name="query_list"]');
       var select_option_val = $cSel.val();
@@ -149,7 +75,8 @@
       sql = "SELECT B,D,E,F,G,H,I WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
 
       var res = sql_query (sheetID,gid,sql);
-      console.log(sql);
+      $(".show_table").html("查詢中...");
+      //console.log(sql);
       window[res] = function(json) {
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
@@ -189,10 +116,21 @@
       }
     }
 
+   $(document).ready(function(){
+
+          $('select[name="query_list"]').change(function(){
+            
+            food_query();
+
+          });
+
+   });
+
     //網頁開始執行
     $(function ()  {
-      console.log('start');
+      console.log('page start');
       list_load_data();
+      $('select[name="query_list"]').change(food_query());
     });
 
 
@@ -200,19 +138,18 @@
     </script>
 
 
-  </head>
-  <body>
-  <div>
-  <a>薩爾達食譜快速檢索器 0.1版</a>
-  </div>
-  <div id="test"></div>
-  <select style="font-size:24px" name="query_list" class="opts">2
-  <option selected value="default">請選擇食材</option>
-  </select>
-  <div></div>
-  <button onclick="food_query()">查詢相關料理</button>
-  <div class="show_table"></div>
+    </head>
+    <body>
+    <div>
+      <a>薩爾達食譜快速檢索器 0.1版</a>
+    </div>
+    <select style="font-size:24px" name="query_list" class="opts">2
+      <option selected value="default">請選擇食材</option>
+    </select>
+    <div></div>
+    <!--button onclick="food_query()">查詢相關料理</button-->
+    <div class="show_table"></div>
 
-                                    
+                                      
   </body>
 </html>
