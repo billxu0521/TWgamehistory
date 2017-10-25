@@ -94,12 +94,13 @@
       $("#test").html(html);
     });}
 
-    //查詢式
+    //查詢公用函式
     function sql_query(sheetID,gid,sql = null){
       var sheetID = sheetID; // 試算表代號
       var gid = gid; // 工作表代號
-      var sql = sql; // SQL 語法
+      var sql = encodeURI(sql); // SQL 語法 做URL轉換
       var callback = "callback"; // 回呼函數名稱
+
       //送出查詢
       if(sql == null){
         $.getScript("https://spreadsheets.google.com/tq?tqx=responseHandler:" + callback + "&key=" + sheetID + "&gid=" + gid);
@@ -113,7 +114,7 @@
     function list_load_data(){
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "2128108946", // 工作表代號
-      sql = "SELECT+B+%2C+C"; // SQL 語法
+      sql = "SELECT B,C"; // SQL 語法
       
       var res = sql_query (sheetID,gid,sql);
 
@@ -153,19 +154,19 @@
       
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "677707019", // 工作表代號
-      sql = "SELECT B,D WHERE E = '" + select_option_val + "'"; // SQL 語法
-      var url_sql = encodeURI(sql);
+      sql = "SELECT B,D,E,F,G,H,I WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
 
-      var res = sql_query (sheetID,gid,url_sql);
+      var res = sql_query (sheetID,gid,sql);
       console.log(sql);
-      console.log(url_sql);
       window[res] = function(json) {
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
         html = "",
         i, j, name_jp, name_jp, spell;
+        
         console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
+          var idt = new Array;
           dataGroup = rowArray[i].c;
           dataLength = dataGroup.length;
           for (j = 0; j < dataLength; j++) {
@@ -175,11 +176,24 @@
           }
           name_jp = dataGroup[0].v;
           spell = dataGroup[1].v;
-          
-          html += "食譜名稱:" + name_jp + ",效果:" + spell +  "<br/>";
+          console.log(dataGroup[0].v+"====");
+          var all_idt = ''
+          for(a = 2; a < 7; a++){
+            
+            if(dataGroup[a] === null) {
+              break;
+            }else if(dataGroup[a].v === null){
+              break;
+            }
+              console.log(dataGroup[a]);
+              idt[a-2] = dataGroup[a].v;
+              all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
+          }
+          //console.log(idt);
+          html += "[食譜名稱]:" + name_jp + "   /   <font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font>   =>  " +all_idt +  "<br/>";
           //html += "<br/>";
         }
-        $("#test").html(html);
+        $(".show_table").html(html);
       }
     }
 
@@ -199,11 +213,12 @@
   <div>
   <a>薩爾達食譜快速檢索器 0.1版</a>
   </div>
-  <select name="query_list" class="opts">2
+  <select style="font-size:24px" name="query_list" class="opts">2
   <option selected value="default">請選擇食材</option>
   </select>
   <div></div>
   <button onclick="food_query()">查詢相關料理</button>
+  <div class="show_table"></div>
 
                                     
   </body>
