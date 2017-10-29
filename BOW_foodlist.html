@@ -72,7 +72,7 @@
 
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "677707019", // 工作表代號
-      sql = "SELECT B,D,E,F,G,H,I WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
+      sql = "SELECT B,D,E,F,G,H,I,J WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
 
       var res = sql_query (sheetID,gid,sql);
       $(".show_table").html("查詢中...");
@@ -81,9 +81,9 @@
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
         html = "",
-        i, j, name_jp, name_jp, spell;
+        i, j, name_jp, name_jp, spell,status;
         
-        console.log(rowArray);
+        //console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
           var idt = new Array;
           dataGroup = rowArray[i].c;
@@ -95,42 +95,58 @@
           }
           name_jp = dataGroup[0].v;
           spell = dataGroup[1].v;
-          console.log(dataGroup[0].v+"====");
+          status = dataGroup[2].v;
+          //console.log(dataGroup[0].v+"====");
           var all_idt = ''
-          for(a = 2; a < 7; a++){
+          var status_clu = '';
+          for(a = 3; a < 8; a++){
             
             if(dataGroup[a] === null) {
               break;
             }else if(dataGroup[a].v === null){
               break;
             }
-              console.log(dataGroup[a]);
+              //console.log(dataGroup[a]);
               idt[a-2] = dataGroup[a].v;
+
               all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
           }
           //console.log(idt);
-          html += "[食譜名稱]:" + name_jp + "   /   <font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font>   =>  " +all_idt +  "<br/>";
+          html += "<div id='food' class='"+ status +"'><font color='blue'>[食譜名稱]</font>:" + name_jp + "<font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font><div name='idt'>     " +all_idt +  "</div></div><br>";
           //html += "<br/>";
         }
         $(".show_table").html(html);
       }
     }
-
-   $(document).ready(function(){
-
+    function filter_start(selector){
+      $(selector).change(function(){
+        if(this.checked){
+          console.log(this.value+",open");
+          $("."+this.value).show();
+        }else{
+          console.log(this.value+",close");
+          $("."+this.value).hide();
+        }
+      });
+    }
+    $(document).ready(function(){
+          /*
           $('select[name="query_list"]').change(function(){
-            
             food_query();
-
           });
-
-   });
+          filter_start('.filter_checkbox');
+*/
+    });
 
     //網頁開始執行
     $(function ()  {
       console.log('page start');
       list_load_data();
-      $('select[name="query_list"]').change(food_query());
+      //$('select[name="query_list"]').change(food_query());
+      $('select[name="query_list"]').change(function(){
+            food_query();
+          });
+      filter_start('.filter_checkbox');  
     });
 
 
@@ -147,6 +163,17 @@
       <option selected value="default">請選擇食材</option>
     </select>
     <div></div>
+    <div>
+      <input type="checkbox" class="filter_checkbox" id="HP_limit_filter" value="HP_limit" checked> 血量上限</input>
+      <input type="checkbox" class="filter_checkbox" id="STA_filter" value="STA" checked> 回復耐力</input>
+      <input type="checkbox" class="filter_checkbox" id="STA_limit_filter" value="STA_limit" checked> 耐力上限</input>
+      <input type="checkbox" class="filter_checkbox" id="Speed_UP_filter" value="Speed_UP" checked> 提高速度</input>
+      <input type="checkbox" class="filter_checkbox" id="Cold_def_filter" value="Cold_def" checked> 防護寒冷</input>
+      <input type="checkbox" class="filter_checkbox" id="Hot_def_filter" value="Hot_def" checked> 防護酷暑</input>
+      <input type="checkbox" class="filter_checkbox" id="Lighting_def_filter" value="Lighting_def" checked> 防護雷電</input>
+      <input type="checkbox" class="filter_checkbox" id="Atk_up_filter" value="Atk_up" checked> 增加攻擊力</input>
+      <input type="checkbox" class="filter_checkbox" id="Def_up_filter" value="Def_up" checked> 增加防禦力</input>
+    </div>
     <!--button onclick="food_query()">查詢相關料理</button-->
     <div class="show_table"></div>
 
