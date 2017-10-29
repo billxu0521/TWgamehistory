@@ -112,7 +112,7 @@
               all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
           }
           //console.log(idt);
-          html += "<div id='food' class='"+ status +"'><font color='blue'>[食譜名稱]</font>:" + name_jp + "<font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font><div name='idt'>     " +all_idt +  "</div></div><br>";
+          html += "<div id='food' class='"+ status +"' style='background-color:#FFFFFF;padding:8px;margin-bottom:4px;border:1px double;opacity:0.9;text-align:center;''><font color='blue'>[食譜名稱]</font>:" + name_jp + "<font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font><div name='idt'>     " +all_idt +  "</div></div><br>";
           //html += "<br/>";
         }
         $(".show_table").html(html);
@@ -155,15 +155,18 @@
 
 
     </head>
-    <body>
-    <div>
+    <body background="https://3.bp.blogspot.com/-KXyvbGYg8Jg/WfWpK1QlreI/AAAAAAAAcsU/oOcSA-AzReUfUpLL88cA7WVN5yL_6wddgCLcBGAs/s1600/zelda.jpg">
+
+    <div style="background-color:#FFFFFF;padding:8px;margin-bottom:4px;opacity:0.9;text-align:center;">
       <a>薩爾達食譜快速檢索器 0.1版</a>
     </div>
-    <select style="font-size:24px" name="query_list" class="opts">2
+    <div style="text-align-last:center;">
+    <select style="font-size:24px;" name="query_list" class="opts" >
       <option selected value="default">請選擇食材</option>
     </select>
+    </div>
     <div></div>
-    <div>
+    <div style="background-color:#FFFFFF;padding:8px;margin-bottom:4px;border:4px black double;opacity:0.9;text-align:center;">
       <input type="checkbox" class="filter_checkbox" id="HP_limit_filter" value="HP_limit" checked> 血量上限</input>
       <input type="checkbox" class="filter_checkbox" id="STA_filter" value="STA" checked> 回復耐力</input>
       <input type="checkbox" class="filter_checkbox" id="STA_limit_filter" value="STA_limit" checked> 耐力上限</input>
