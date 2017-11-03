@@ -5,6 +5,8 @@
     <title>Game TimeLine Project</title>
 
 
+    <link rel="stylesheet" type="text/css" href="BOW_foodlist.css">
+
     <script type="text/javascript">
     </script>  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.2.1/react.min.js"></script>
@@ -12,9 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.1/babel.min.js"></script>
     <script language="javascript">
     </script> 
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script><div id="test"></div>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>
+    <script src="https://unpkg.com/masonry-layout@4.2.0/dist/masonry.pkgd.min.js"></script>
+
     <script>
+
    
+    var LANG_TYPE = 'ch';//切換語言用
+    var MATERIAL = new Object();
 
     //查詢公用函式
     function sql_query(sheetID,gid,sql = null){
@@ -32,22 +39,29 @@
       return callback;
     }
 
+
     //讀取食材列表
     function list_load_data(){
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "2128108946", // 工作表代號
-      sql = "SELECT B,C"; // SQL 語法
+      sql = "SELECT B,C,D"; // SQL 語法
       
       var res = sql_query (sheetID,gid,sql);
 
       window[res] = function(json) {
+        var show_name = '';
         var $cSel = $('select[name="query_list"]');
+    $cSel.find('option')
+    .remove()
+    .end();
+
+
         var rowArray = json.table.rows,
         
         rowLength = rowArray.length,
         html = "",
-        i, j, name_jp, name_jp;
-        console.log(rowArray);
+        i, j, name_jp, name_jp , name_en;
+        //console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
           dataGroup = rowArray[i].c;
           dataLength = dataGroup.length;
@@ -58,9 +72,20 @@
           }
           name_jp = dataGroup[0].v;
           name_ch = dataGroup[1].v;
+          name_en = dataGroup[2].v;
+          if(LANG_TYPE == 'ch'){
+            show_name = name_ch;
+          }else if(LANG_TYPE == 'jp'){
+            show_name = name_jp;
+          }else if(LANG_TYPE == 'en'){
+            show_name = name_en;
+          }
+          var _obj = {"name_ch":name_ch,"name_jp":name_jp};
+          MATERIAL[name_ch] = _obj;
+
           $cSel.append($("<option></option>")
-               .attr("value",name_jp)
-               .text(name_ch)); 
+               .attr("value",name_ch)
+               .text(show_name));    
         }
       }
     }
@@ -72,19 +97,20 @@
 
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "677707019", // 工作表代號
-      sql = "SELECT B,D,E,F,G,H,I,J WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
+      sql = "SELECT B,C,D,E,F,G,H,I,J,L WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
 
       var res = sql_query (sheetID,gid,sql);
-      $(".show_table").html("查詢中...");
+      $(".container").html("查詢中...");
       //console.log(sql);
       window[res] = function(json) {
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
         html = "",
-        i, j, name_jp, name_jp, spell,status;
+        i, j, name_jp, name_jp,name_en, effect,effect_type;
         
-        //console.log(rowArray);
+        console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
+          var show_name = '';
           var idt = new Array;
           dataGroup = rowArray[i].c;
           dataLength = dataGroup.length;
@@ -94,12 +120,34 @@
             }
           }
           name_jp = dataGroup[0].v;
-          spell = dataGroup[1].v;
-          status = dataGroup[2].v;
+
+          if(dataGroup[1] == null){
+            name_ch = '';
+          }else{
+            name_ch = dataGroup[1].v;
+          }
+
+          if(dataGroup[2] == null){
+            name_en = '';
+          }else{
+            name_en = dataGroup[2].v;
+          }
+          
+          if(LANG_TYPE == 'ch'){
+            show_name = name_ch;
+          }else if(LANG_TYPE == 'jp'){
+            show_name = name_jp;
+          }else if(LANG_TYPE == 'en'){
+            show_name = name_en;
+          }
+
+
+          effect = dataGroup[3].v;
+          effect_type = dataGroup[4].v;
           //console.log(dataGroup[0].v+"====");
           var all_idt = ''
           var status_clu = '';
-          for(a = 3; a < 8; a++){
+          for(a = 4; a < 9; a++){
             
             if(dataGroup[a] === null) {
               break;
@@ -112,53 +160,110 @@
               all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
           }
           //console.log(idt);
-          html += "<div id='food' class='"+ status +"' style='background-color:#FFFFFF;padding:8px;margin-bottom:4px;border:1px double;opacity:0.9;text-align:center;''><font color='blue'>[食譜名稱]</font>:" + name_jp + "<font color ='blue'>[效果]</font>:<font color ='green'>" + spell + "</font><div name='idt'>     " +all_idt +  "</div></div><br>";
+          html += "<div class='item' id='"+ effect_type +"' '><br><img src='https://image.freepik.com/free-icon/picture-frame-with-mountain-image_318-40293.jpg' alt='image' style='height: auto;width: 100%;'><a class='name'>" + show_name + "</a><font color ='blue'><br>[效果]</font>:<font color ='green'>" + effect + "</font><div name='idt'>     " +all_idt +  "</div></div>";
           //html += "<br/>";
         }
-        $(".show_table").html(html);
+        $(".container").html(html);
       }
     }
+    //篩選器
     function filter_start(selector){
       $(selector).change(function(){
         if(this.checked){
           console.log(this.value+",open");
-          $("."+this.value).show();
+          $("#"+this.value).show();
         }else{
           console.log(this.value+",close");
-          $("."+this.value).hide();
+          $("#"+this.value).hide();
         }
       });
     }
-    $(document).ready(function(){
-          /*
-          $('select[name="query_list"]').change(function(){
-            food_query();
-          });
-          filter_start('.filter_checkbox');
-*/
-    });
+    //語言選擇
+    function lang_select(selector){
+      $(selector).change(function(){
+        LANG_TYPE = $('input[name=lang_checkbox]:checked').val();
+        switch (LANG_TYPE){
+
+        case 'ch':
+          $('#HP_limit_name').text('血量上限');
+          $('#STA_name').text('回復耐力');
+          $('#STA_limit_name').text('耐力上限');
+          $('#Speed_UP_name').text('提高速度');
+          $('#Cold_def_name').text('防護寒冷');
+          $('#Hot_def_name').text('防護酷暑');
+          $('#Lighting_def_name').text('防護雷電');
+          $('#Atk_upname').text('增加攻擊力');
+          $('#Def_up_name').text('增加防禦力');
+          $('#title').text('薩爾達食譜快速檢索器');
+          break;
+          case 'jp':
+          $('#HP_limit_name').text('HP_limit');
+          $('#STA_name').text('STA');
+          $('#STA_limit_name').text('STA_limit');
+          $('#Speed_UP_name').text('Speed_UP_');
+          $('#Cold_def_name').text('Cold_def');
+          $('#Hot_def_name').text('Hot_def');
+          $('#Lighting_def_name').text('Lighting_def');
+          $('#Atk_up_name').text('Atk_up');
+          $('#Def_up_name').text('Def_up'); 
+          $('#title').text('Zelda BOW recipe tool'); 
+          break;
+          case 'en':
+          $('#HP_limit_name').text = 'HP_limit';
+          $('#STA_name').text('rstore STA');
+          $('#STA_limit_name').text('STA_limit');
+          $('#Speed_UP_name').text('Speed_UP_');
+          $('#Cold_def_name').text('Cold_def');
+          $('#Hot_def_name').text('Hot_def');
+          $('#Lighting_def_name').text('Lighting_def');
+          $('#Atk_up_name').text('Atk_up');
+          $('#Def_up_name').text('Def_up');
+          $('#title').text('Zelda BOW recipe tool'); 
+          break;
+        }
+
+        list_load_data();
+      });
+      
+    }
+
+    
+
+
 
     //網頁開始執行
     $(function ()  {
+      $('#container').masonry({
+          // options
+          itemSelector : '.item',
+          columnWidth : 240
+        });
+
       console.log('page start');
+      
       list_load_data();
       //$('select[name="query_list"]').change(food_query());
       $('select[name="query_list"]').change(function(){
             food_query();
           });
       filter_start('.filter_checkbox');  
+      lang_select('input[name=lang_checkbox]');
     });
-
 
 
     </script>
 
 
     </head>
-    <body background="https://3.bp.blogspot.com/-KXyvbGYg8Jg/WfWpK1QlreI/AAAAAAAAcsU/oOcSA-AzReUfUpLL88cA7WVN5yL_6wddgCLcBGAs/s1600/zelda.jpg">
+    <body >
 
     <div style="background-color:#FFFFFF;padding:8px;margin-bottom:4px;opacity:0.9;text-align:center;">
-      <a>薩爾達食譜快速檢索器 0.1版</a>
+      <a id='title'>薩爾達食譜快速檢索器 0.5版</a>
+    </div>
+    <div style="background-color:#FFFFFF;padding:8px;margin-bottom:4px;border:4px black double;opacity:0.9;text-align:center;">
+      <input type="radio" name="lang_checkbox" value="ch" checked> 繁體中文</input>
+      <input type="radio" name="lang_checkbox" value="jp" > 日本語</input>
+      <input type="radio" name="lang_checkbox" value="en" > English</input>
     </div>
     <div style="text-align-last:center;">
     <select style="font-size:24px;" name="query_list" class="opts" >
@@ -167,18 +272,18 @@
     </div>
     <div></div>
     <div style="background-color:#FFFFFF;padding:8px;margin-bottom:4px;border:4px black double;opacity:0.9;text-align:center;">
-      <input type="checkbox" class="filter_checkbox" id="HP_limit_filter" value="HP_limit" checked> 血量上限</input>
-      <input type="checkbox" class="filter_checkbox" id="STA_filter" value="STA" checked> 回復耐力</input>
-      <input type="checkbox" class="filter_checkbox" id="STA_limit_filter" value="STA_limit" checked> 耐力上限</input>
-      <input type="checkbox" class="filter_checkbox" id="Speed_UP_filter" value="Speed_UP" checked> 提高速度</input>
-      <input type="checkbox" class="filter_checkbox" id="Cold_def_filter" value="Cold_def" checked> 防護寒冷</input>
-      <input type="checkbox" class="filter_checkbox" id="Hot_def_filter" value="Hot_def" checked> 防護酷暑</input>
-      <input type="checkbox" class="filter_checkbox" id="Lighting_def_filter" value="Lighting_def" checked> 防護雷電</input>
-      <input type="checkbox" class="filter_checkbox" id="Atk_up_filter" value="Atk_up" checked> 增加攻擊力</input>
-      <input type="checkbox" class="filter_checkbox" id="Def_up_filter" value="Def_up" checked> 增加防禦力</input>
+      <input type="checkbox" class="filter_checkbox" id="HP_limit_filter" value="HP_limit" checked></input><a id="HP_limit_name">血量上限</a>
+      <input type="checkbox" class="filter_checkbox" id="STA_filter" value="STA" checked></input><a id="STA_name">回復耐力</a>
+      <input type="checkbox" class="filter_checkbox" id="STA_limit_filter" value="STA_limit" checked></input><a id="STA_limit_name">耐力上限</a>
+      <input type="checkbox" class="filter_checkbox" id="Speed_UP_filter" value="Speed_UP" checked></input><a id="Speed_UP_name">提高速度</a>
+      <input type="checkbox" class="filter_checkbox" id="Cold_def_filter" value="Cold_def" checked></input><a id="Cold_def_name">防護寒冷</a>
+      <input type="checkbox" class="filter_checkbox" id="Hot_def_filter" value="Hot_def" checked></input><a id="Hot_def_name">防護酷暑</a>
+      <input type="checkbox" class="filter_checkbox" id="Lighting_def_filter" value="Lighting_def" checked></input><a id="Lighting_def_name">防護雷電</a>
+      <input type="checkbox" class="filter_checkbox" id="Atk_up_filter" value="Atk_up" checked></input><a id="Atk_up_name">增加攻擊力</a>
+      <input type="checkbox" class="filter_checkbox" id="Def_up_filter" value="Def_up" checked></input><a id="Def_up_name">增加防禦力</a>
     </div>
     <!--button onclick="food_query()">查詢相關料理</button-->
-    <div class="show_table"></div>
+    <div class='container'></div>
 
                                       
   </body>
