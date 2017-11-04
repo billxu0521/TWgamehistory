@@ -2,9 +2,9 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Game TimeLine Project</title>
-
-
     <link rel="stylesheet" type="text/css" href="BOW_foodlist.css">
 
     <script type="text/javascript">
@@ -106,7 +106,7 @@
 
       var sheetID = "1Nj4CDgWbeIRbv-5SAfQyujYDcXKZFrOfR83MbZ181E0", // 試算表代號
       gid = "677707019", // 工作表代號
-      sql = "SELECT B,C,D,E,F,G,H,I,J,L WHERE E = '" + select_option_val + "' or F = '" + select_option_val + "' or G = '" + select_option_val + "' or H = '" + select_option_val + "' or I = '" + select_option_val + "' "; // SQL 語法
+      sql = "SELECT B,C,D,E,F,G,H,I,J,K,L,M,N,O WHERE J = '" + select_option_val + "' or K = '" + select_option_val + "' or L = '" + select_option_val + "' or M = '" + select_option_val + "' or N = '" + select_option_val + "' "; // SQL 語法
 
       var res = sql_query (sheetID,gid,sql);
       $(".container").html("查詢中...");
@@ -115,7 +115,7 @@
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
         html = "",
-        i, j, name_jp, name_jp,name_en, effect,effect_type;
+        i, j, name_jp, name_jp,name_en, M_eff,M_eff_time,S_eff,S_eff_time,effect_type;
         
         console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
@@ -150,13 +150,15 @@
             show_name = name_en;
           }
 
-
-          effect = dataGroup[3].v;
-          effect_type = dataGroup[4].v;
+          //整理資料
+          M_eff = dataGroup[3].v;//補血
+          M_eff_time = dataGroup[4].v;//補血效果
+          S_eff = dataGroup[5].v;//次要效果
+          S_eff_time = dataGroup[6].v;//次要效果時間
+          effect_type = dataGroup[7].v;
           //console.log(dataGroup[0].v+"====");
           var all_idt = ''
-          var status_clu = '';
-          for(a = 4; a < 9; a++){
+          for(a = 8; a < 13; a++){
             
             if(dataGroup[a] === null) {
               break;
@@ -169,7 +171,7 @@
               all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
           }
           //console.log(idt);
-          html += "<div class='item' id='"+ effect_type +"' '><br><img src='https://image.freepik.com/free-icon/picture-frame-with-mountain-image_318-40293.jpg' alt='image' style='height: auto;width: 100%;'><a class='name'>" + show_name + "</a><font color ='blue'><br>[效果]</font>:<font color ='green'>" + effect + "</font><div name='idt'>     " +all_idt +  "</div></div>";
+          html += "<div class='item' id='"+ effect_type +"' '><br><img src='https://image.freepik.com/free-icon/picture-frame-with-mountain-image_318-40293.jpg' alt='image' style='height: auto;width: 100%;'><a class='name'>" + show_name + "</a><font id='HP_eff_tittle' ><br>[回復血量]</font>:<font id='Second_eff'>" + M_eff_time + "</font><br><font id='Second_eff_tittle'>[次要效果]</font>:<font id='Second_eff'>" + S_eff + "</font><font id='Second_eff_time_tittle'>[次要效果]</font>:<font id='Second_eff_time'>" + S_eff_time + "</font><br><div name='idt'>     " +all_idt +  "</div></div>";
           //html += "<br/>";
         }
         $(".container").html(html);
@@ -292,7 +294,7 @@
       <input type="checkbox" class="filter_checkbox" id="Def_up_filter" value="Def_up" checked></input><a id="Def_up_name">增加防禦力</a>
     </div>
     <!--button onclick="food_query()">查詢相關料理</button-->
-    <div class='container'></div>
+    <div id=main ><div class='container' id='show_table'></div></div>
 
                                       
   </body>
