@@ -21,7 +21,7 @@
 
    
     var LANG_TYPE = 'ch';//切換語言用
-    var MATERIAL = new Object();
+    var MATERIAL = new Object(); //材料物件 
 
     //查詢公用函式
     function sql_query(sheetID,gid,sql = null){
@@ -89,9 +89,9 @@
           }else if(LANG_TYPE == 'en'){
             show_name = name_en;
           }
-          var _obj = {"name_ch":name_ch,"name_jp":name_jp};
+          var _obj = {"name_ch":name_ch,"name_jp":name_jp,"name_en":name_en};
           MATERIAL[name_ch] = _obj;
-
+          //console.log(MATERIAL[name_ch].name_ch);
           $cSel.append($("<option></option>")
                .attr("value",name_ch)
                .text(show_name));    
@@ -166,8 +166,9 @@
               break;
             }
               //console.log(dataGroup[a]);
-              idt[a-2] = dataGroup[a].v;
-
+              var _idt = get_material(dataGroup[a].v);
+              //idt = dataGroup[a].v;
+              idt[a-2] = _idt;
               all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
           }
           //console.log(idt);
@@ -177,6 +178,23 @@
         $(".container").html(html);
       }
     }
+
+    //讀取不同語言的材料物件
+    function get_material(str){
+      var _str;
+console.log(str)
+      console.log(MATERIAL[str].name_jp);
+
+      if(LANG_TYPE == 'ch'){
+        _str = String(MATERIAL[str].name_ch);
+      }else if(LANG_TYPE == 'jp'){
+        _str = String(MATERIAL[str].name_jp);
+      }else if(LANG_TYPE == 'en'){
+        _str = String(MATERIAL[str].name_en);
+      }
+      return _str;
+    }
+
     //篩選器
     function filter_start(selector){
       $(selector).change(function(){
