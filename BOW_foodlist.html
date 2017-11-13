@@ -115,7 +115,7 @@
         var rowArray = json.table.rows,
         rowLength = rowArray.length,
         html = "",
-        i, j, name_jp, name_jp,name_en, M_eff,M_eff_time,S_eff,S_eff_time,effect_type;
+        i, j, name_jp, name_jp,name_en, M_eff,M_eff_time,S_eff,S_eff_time,effect_type,img_rul;
         
         console.log(rowArray);
         for (i = 0; i < rowLength; i++) {
@@ -143,12 +143,13 @@
           }
           
           if(LANG_TYPE == 'ch'){
-            show_name = name_ch;
+            show_name = name_ch + '/(' + name_jp + ')';
           }else if(LANG_TYPE == 'jp'){
             show_name = name_jp;
           }else if(LANG_TYPE == 'en'){
-            show_name = name_en;
+            show_name = name_en + '/(' + name_jp + ')';
           }
+          
 
           //整理資料
           M_eff = dataGroup[3].v;//補血
@@ -156,6 +157,8 @@
           S_eff = dataGroup[5].v;//次要效果
           S_eff_time = dataGroup[6].v;//次要效果時間
           effect_type = dataGroup[7].v;
+          img_rul = dataGroup[13].v
+
           //console.log(dataGroup[0].v+"====");
           var all_idt = ''
           for(a = 8; a < 13; a++){
@@ -169,10 +172,10 @@
               var _idt = get_material(dataGroup[a].v);
               //idt = dataGroup[a].v;
               idt[a-2] = _idt;
-              all_idt += "    <font color='blue'>[食材]</font>:<font color='red'>" + idt[a-2] + "</font>";
+              all_idt += "</font><font color='red'>" + idt[a-2] + "</font><br>";
           }
           //console.log(idt);
-          html += "<div class='item' id='"+ effect_type +"' '><br><img src='https://image.freepik.com/free-icon/picture-frame-with-mountain-image_318-40293.jpg' alt='image' style='height: auto;width: 100%;'><a class='name'>" + show_name + "</a><font id='HP_eff_tittle' ><br>[回復血量]</font>:<font id='Second_eff'>" + M_eff_time + "</font><br><font id='Second_eff_tittle'>[次要效果]</font>:<font id='Second_eff'>" + S_eff + "</font><font id='Second_eff_time_tittle'>[次要效果]</font>:<font id='Second_eff_time'>" + S_eff_time + "</font><br><div name='idt'>     " +all_idt +  "</div></div>";
+          html += "<div class='item' id='"+ effect_type +"' '><br><img id='food_img' src='"+ img_rul +"' alt='image' style='height: auto;width: 80%;'><a class='name'>" + show_name + "</a><font id='HP_eff_tittle' ><img id='hp_img' src='https://i.imgur.com/58zgZjR.png' alt='image' style='width: 10%;'></img><font id='HP_eff'>" + M_eff_time + "</font><br><font id='Second_eff_tittle'>[次要效果]</font>:<font id='Second_eff'>" + S_eff + "</font><font id='Second_eff_time_tittle'>[次要效果]</font>:<font id='Second_eff_time'>" + S_eff_time + "</font><br><div name='idt'>     " +all_idt +  "</div></div>";
           //html += "<br/>";
         }
         $(".container").html(html);
@@ -184,13 +187,15 @@
       var _str;
 console.log(str)
       console.log(MATERIAL[str].name_jp);
-
+      var str_jp = String(MATERIAL[str].name_jp);
       if(LANG_TYPE == 'ch'){
         _str = String(MATERIAL[str].name_ch);
+        _str += '/' + str_jp;
       }else if(LANG_TYPE == 'jp'){
         _str = String(MATERIAL[str].name_jp);
       }else if(LANG_TYPE == 'en'){
         _str = String(MATERIAL[str].name_en);
+        _str += '/' + str_jp;
       }
       return _str;
     }
@@ -252,6 +257,8 @@ console.log(str)
         }
 
         list_load_data();
+        var html = '';
+        $(".container").html(html);
       });
       
     }
